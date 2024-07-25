@@ -72,7 +72,7 @@
                     <i class="mdi mdi-close"></i>
                 </span>
             </div>
-            <iframe :src="kodikLink" frameborder="0" allowfullscreen style="width: 100%; height:450px; border-radius: 5px;"></iframe>
+            <iframe :src="kodikLink" frameborder="0" allowfullscreen style="width: 100%; height:450px;"></iframe>
             <div v-if="chronology" class="chronology">
                 <h5>Хронология:</h5>
                 <div class="chrono" v-for="event in chronology" :key="event.id" @click="showKodikPlayer(event)">
