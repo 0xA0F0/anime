@@ -15,42 +15,32 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="anime.js" type="module"></script>
+    <base target="_blank">
   </head>
   <body>
     <click-spark></click-spark>
     <main id="app" class="all">
-        <nav :class="{ last_query: lastSearchQuery }">
-          <button class="mdi mdi-information-outline" @click="showInfo"></button>
-           <div class="last"> Последний запрос:   <span v-if="lastSearchQuery" @click="restoreLastSearch" class="last-search" style="cursor: pointer; opacity: .7; border-bottom: 1px solid var(--color);">  {{ lastSearchQuery }} </span></div>
-<div class="this">
-            <input 
-                type="text" 
-                size="25" 
-                placeholder="Что хочешь посмотреть?" 
-                v-model="searchQuery"
-                @keyup.enter="searchAnimes">
-            <button 
-                class="mdi mdi-close" 
-                @click="clearSearchQuery" 
-                v-if="searchQuery" 
-                style=" border-left: none; border-radius: 0; "
-            ></button>
-            <button 
-                class="mdi mdi-magnify" 
-                @click="searchAnimes"
-            ></button>
+      <nav :class="{ last_query: lastSearchQuery }">
+        <button class="mdi mdi-information-outline" @click="showInfo"></button>
+        <div class="last"> Последний запрос: <span v-if="lastSearchQuery" @click="restoreLastSearch" class="last-search" style="cursor: pointer; opacity: .7; border-bottom: 1px solid var(--color);"> {{ lastSearchQuery }} </span>
         </div>
-        </nav>  
+        <div class="this">
+          <input type="text" size="25" placeholder="Что хочешь посмотреть?" v-model="searchQuery" @keyup.enter="searchAnimes">
+          <button class="mdi mdi-close" @click="clearSearchQuery" v-if="searchQuery" style=" border-left: none; border-radius: 0; "></button>
+          <button class="mdi mdi-magnify" @click="searchAnimes"></button>
+        </div>
+      </nav>
       <br>
       <div v-if="loading" class="loading">Загрузка...</div>
       <div class="list" v-if="!loading && animes.length">
-        <div v-for="anime in animes" :key="anime.id" class="anime">
+        <div v-for="anime in animes" :key="anime.id" class="anime" @mouseover="showDescription = anime.id" @mouseleave="showDescription = null">
           <div class="hs">
             <img class="anime-poster" v-if="anime.poster && anime.poster.preview2xUrl" :src="anime.poster.preview2xUrl" :alt="anime.russian || 'Anime Poster'">
             <div class="play" @click="showKodikPlayer(anime)"></div>
           </div>
           <span class="name">{{ anime.russian }}</span>
           <span :class="`status ${anime.status.class}`">{{ anime.status.text }}</span>
+          <div class="description" v-if="showDescription === anime.id && hasDescription(anime.descriptionHtml)" v-html="anime.descriptionHtml"></div>
         </div>
       </div>
       <div v-else-if="!loading" class="empty-message"> Пусто </div>
@@ -72,15 +62,17 @@
           <iframe :src="kodikLink" frameborder="0" allowfullscreen style="width: 100%; height: 100%; border-radius: 5px;"></iframe>
         </div>
       </div>
-       <div v-if="infoVisible" class="info-popup">
+      <div v-if="infoVisible" class="info-popup">
         <div class="info-popup-content">
-            <span class="close" @click="closeInfo"><i class="mdi mdi-close" style=" font-size: 16px; "></i></span>
-            <h2>Информация</h2>
-            <hr>
-            <br>
-            <p>На сайте часто ведутся технические работы.</p>
+          <span class="close" @click="closeInfo">
+            <i class="mdi mdi-close" style=" font-size: 16px; "></i>
+          </span>
+          <h2>Информация</h2>
+          <hr>
+          <br>
+          <p>На сайте часто ведутся технические работы.</p>
         </div>
-    </div>
+      </div>
       <div v-if="error" class="error">
         <i class="mdi mdi-alert-octagon" style="font-size:20px; color: #721c24;"></i>{{ error }}
       </div>
