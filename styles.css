@@ -127,7 +127,7 @@ hr {
   border-top: 0;
   border-right: 0;
   border-left: 0;
-  border-bottom:1px solid var(--color-2);
+  border-color: var(--color-2);
 }
 
 :focus {
@@ -148,7 +148,9 @@ b {
 
 a {
   text-decoration: none;
+  color: crimson;
 }
+a:hover { opacity: .7;}
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -435,25 +437,23 @@ nav:before {
   cursor: pointer;
 }
 
-.like-it {
-  display: grid;
-  grid-template-columns: 28px 10px min-content;
-  align-items: center;
+@media (max-width:978px) {
+  .description {
+    display: none;
+  }
 }
 
-.like {
-  display: flex;
-  width: 28px;
-  height: 28px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-}
-
-.like > i {
-  font-size: 16px;
-}
-
-.liked {
-  background: var(--color-1);
+.description {
+  position: absolute;
+  left: 195px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 10;
+  -webkit-box-orient: vertical;
+  z-index: 9;
+  background: var(--c);
+  width: 200px;
+  padding: 5px;
+  border: 1px solid var(--color);
 }
