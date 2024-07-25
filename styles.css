@@ -190,25 +190,33 @@ main {
 }
 
 @media (max-width: 478px) {
-  nav > input,
+  nav > .this > input,
   nav {
     width: 100%;
   }
 }
-nav > input::placeholder {
+nav > .this > input::placeholder {
   opacity: 0.5;
 }
+
 nav {
-  float: right;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  width: 100%;
+  gap: 10px;
+  align-items: center;
+}
+
+
+.this {
   display: flex;
   flex-direction: row;
 }
-
-nav > input {
+nav > .this > input {
   border-radius: 3px 0 0 3px;
 }
 
-nav > button {
+nav > .this > button {
   border-radius: 0 3px 3px 0;
   border-left: 0;
 }
@@ -263,7 +271,7 @@ nav:before {
   position: relative;
 }
 
-.name {
+.name, .last {
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -320,11 +328,6 @@ nav:before {
   color: rgb(172, 12, 12);
   text-decoration: none;
   cursor: pointer;
-}
-
-iframe {
-  width: 100%;
-  height: 500px;
 }
 
 .header {
@@ -399,4 +402,58 @@ iframe {
 
 .ongoing {
   background: cornflowerblue;
+}
+
+
+.info-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.info-popup-content {
+  background: var(--c);
+  padding: 15px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 600px;
+  position: relative;
+}
+
+.close-info {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.like-it {
+  display: grid;
+  grid-template-columns: 28px 10px min-content;
+  align-items: center;
+}
+
+.like {
+  display: flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.like > i {
+  font-size: 16px;
+}
+
+.liked {
+  background: var(--color-1);
 }
