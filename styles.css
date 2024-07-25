@@ -423,7 +423,6 @@ nav:before {
 .info-popup-content {
   background: var(--c);
   padding: 15px;
-  border-radius: 8px;
   width: 80%;
   max-width: 600px;
   position: relative;
