@@ -146,11 +146,12 @@ b {
   font-weight: bold;
 }
 
-a {
+a, .chrono {
   text-decoration: none;
   color: crimson;
+  cursor: pointer;
 }
-a:hover { opacity: .7;}
+a:hover, .chrono:hover { opacity: .7;}
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -273,7 +274,7 @@ nav:before {
   position: relative;
 }
 
-.name, .last {
+.name, .last, .title {
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -289,7 +290,6 @@ nav:before {
 }
 
 .window {
-  display: flex;
   position: fixed;
   z-index: 1;
   left: 0;
@@ -297,19 +297,19 @@ nav:before {
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgba(0, 0, 0, 0.4);
-  justify-content: center;
-  align-items: center;
+  background-color: white;
 }
-.player {
+
+.full {
   background-color: var(--c);
   padding: 0 15px 15px 15px;
-  border: 1px solid var(--color-2);
-  border-radius: 5px;
-  max-width: 820px;
-  width: 100%;
-  height: 100%;
-  max-height: 500px;
+  max-width: 860px;
+  margin: 10px auto;
+}
+
+
+
+.player {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -321,7 +321,7 @@ nav:before {
 }
 
 .close i {
-  font-size: 24px;
+  font-size: 20px;
   color: red;
 }
 
@@ -437,6 +437,13 @@ nav:before {
   cursor: pointer;
 }
 
+@media (max-width:978px) {
+  .description {
+    display: none;
+  }
+  
+}
+
 .description {
   position: absolute;
   left: 195px;
@@ -452,8 +459,34 @@ nav:before {
   border: 1px solid var(--color);
 }
 
-@media (max-width:978px) {
-  .description {
-    display: none;
+@media (max-width:768px) {
+.last-search {
+  display: none;
   }
+}
+
+
+.chronology {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.chrono {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+  background: var(--color-1);
+}
+
+.chrono img {
+  width: 50px;
+  height: 50px;
+  min-width: 50px;
+  min-height: 50px;
+}
+
+.chrono .date {
+  padding-right: 5px;
 }
