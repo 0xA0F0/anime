@@ -17,7 +17,8 @@ new Vue({
             error: '', 
             OrderEnum: 'ranked',
             forbidden: 'https://placehold.co/191x271?text=18',
-            infoVisible: false
+            infoVisible: false,
+            showDescription: null,
         };
     },
     created() {
@@ -54,10 +55,12 @@ new Vue({
                             order: ${this.OrderEnum}
                         ) {
                             id
+                            score
                             russian
                             poster { preview2xUrl }
                             genres { id name }  
                             status
+                            descriptionHtml
                         }
                     }
                 `;
@@ -118,6 +121,12 @@ new Vue({
                 };
             });
         },
+        hasDescription(descriptionHtml) {
+            const div = document.createElement('div');
+            div.innerHTML = descriptionHtml;
+            const text = div.querySelector('.b-text_with_paragraphs')?.innerText.trim();
+            return !!text;
+        },
         async searchAnimes() {
             this.lastSearchQuery = this.searchQuery;
             localStorage.setItem('lastSearchQuery', this.lastSearchQuery);
@@ -154,6 +163,8 @@ new Vue({
             this.ShikimoriId = anime.id;
             this.title = anime.russian; 
             this.status = anime.status;
+            this.descriptionHtml = anime.description;
+            this.score = anime.score;
             const kodikUrl = `https://kodikapi.com/search?token=50e058ac7c2b71a73ee87e4fea333544&types=anime-serial,anime&shikimori_id=${this.ShikimoriId}`;
             
             try {
@@ -197,7 +208,6 @@ new Vue({
         }
     }
 });
-
 
 
 
