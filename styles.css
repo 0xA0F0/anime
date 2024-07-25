@@ -437,12 +437,6 @@ nav:before {
   cursor: pointer;
 }
 
-@media (max-width:978px) {
-  .description {
-    display: none;
-  }
-}
-
 .description {
   position: absolute;
   left: 195px;
@@ -456,4 +450,10 @@ nav:before {
   width: 200px;
   padding: 5px;
   border: 1px solid var(--color);
+}
+
+@media (max-width:978px) {
+  .description {
+    display: none;
+  }
 }
