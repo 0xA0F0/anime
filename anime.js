@@ -19,6 +19,7 @@ new Vue({
             forbidden: 'https://placehold.co/191x271?text=18',
             infoVisible: false,
             showDescription: null,
+            chronology: [], // Добавлено для хранения хронологии
         };
     },
     created() {
@@ -170,17 +171,45 @@ new Vue({
             try {
                 const response = await axios.get(kodikUrl);
                 const data = response.data;
-
+        
                 if (data.results.length === 0) {
                     throw new Error('Аниме не найдено в базе данных.');
                 }
-
+        
                 const kodikAnime = data.results[0];
                 if (!kodikAnime.link) {
                     throw new Error('Ошибка');
                 }
-
+        
                 this.kodikLink = kodikAnime.link.startsWith('http') ? kodikAnime.link : `https:${kodikAnime.link}`;
+                
+                const chronologyQuery = `
+                {
+                  animes(search: "${this.title}", limit: 1) {
+                    chronology {
+                      poster {
+                        previewUrl
+                      }
+                      airedOn { year }
+                      id
+                      russian
+                    }
+                  }
+                }
+              `;
+                
+                const chronologyResponse = await axios.post('https://shikimori.one/api/graphql', {
+                    query: chronologyQuery
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+        
+                const chronologyData = chronologyResponse.data.data.animes[0]?.chronology || [];
+                console.log('Fetched chronology:', chronologyData);  
+                this.chronology = chronologyData;
+        
                 this.window = true;
             } catch (error) {
                 this.showError(error.message);
@@ -188,6 +217,7 @@ new Vue({
         },
         close() {
             this.window = false;
+            this.chronology = []; // Очищаем хронологию при закрытии
         },
         showError(message) {
             this.error = message;
@@ -208,6 +238,7 @@ new Vue({
         }
     }
 });
+
 
 
 
