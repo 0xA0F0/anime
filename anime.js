@@ -6,6 +6,7 @@ new Vue({
             currentPage: 1,
             page: 25,
             searchQuery: '',
+            lastSearchQuery: localStorage.getItem('lastSearchQuery') || '',
             isEmpty: false,
             loading: false,
             cache: {},
@@ -15,13 +16,12 @@ new Vue({
             title: '', 
             error: '', 
             OrderEnum: 'ranked',
-            forbidden: 'https://placehold.co/191x271?text=18'  
+            forbidden: 'https://placehold.co/191x271?text=18',
+            infoVisible: false
         };
     },
     created() {
         this.initializePage();
-    },
-    beforeDestroy() {
     },
     methods: {
         initializePage() {
@@ -35,6 +35,8 @@ new Vue({
 
             if (search) {
                 this.searchQuery = search;
+                this.lastSearchQuery = search;
+                localStorage.setItem('lastSearchQuery', search);
             }
             
             this.fetchAnimes();
@@ -117,6 +119,8 @@ new Vue({
             });
         },
         async searchAnimes() {
+            this.lastSearchQuery = this.searchQuery;
+            localStorage.setItem('lastSearchQuery', this.lastSearchQuery);
             this.currentPage = 1;
             this.updatePage();
         },
@@ -179,9 +183,22 @@ new Vue({
             setTimeout(() => {
                 this.error = '';
             }, 3000); 
+        },
+        showInfo() {
+            this.infoVisible = true;
+        },
+        closeInfo() {
+            this.infoVisible = false;
+        },
+        restoreLastSearch() {
+            this.searchQuery = this.lastSearchQuery;
+            this.currentPage = 1;
+            this.updatePage();
         }
     }
 });
+
+
 
 
 // spark
