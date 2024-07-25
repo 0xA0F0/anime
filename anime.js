@@ -332,7 +332,7 @@ function launchConfetti(event) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.hs').forEach(element => {
+    document.querySelectorAll('.info').forEach(element => {
         element.addEventListener('click', launchConfetti);
     });
 });
