@@ -224,7 +224,7 @@ nav > .this > button {
   border-left: 0;
 }
 
-nav:before {
+.logo {
   content: "";
   background: url(/files/img/luffy.webp) no-repeat;
   width: 50px;
@@ -321,7 +321,7 @@ nav:before {
 }
 
 .close i {
-  font-size: 18px;
+  font-size: 20px;
   color: red;
 }
 
@@ -423,6 +423,7 @@ nav:before {
 .info-popup-content {
   background: var(--c);
   padding: 15px;
+  border-radius: 8px;
   width: 80%;
   max-width: 600px;
   position: relative;
@@ -451,13 +452,13 @@ nav:before {
   width: 200px;
   padding: 5px;
   border: 1px solid var(--color);
-  border-radius:3px;
 }
 
 @media (max-width:978px) {
   .description {
     display: none;
   }
+  
 }
 
 @media (max-width:768px) {
