@@ -6,30 +6,53 @@ new Vue({
             currentPage: 1,
             page: 25,
             searchQuery: '',
-            lastSearchQuery: localStorage.getItem('lastSearchQuery') || '',
+            lastSearchQuery: '',
             isEmpty: false,
             loading: false,
             cache: {},
             window: false,
             kodikLink: '',
-            ShikimoriId: '', 
-            title: '', 
-            error: '', 
+            ShikimoriId: '',
+            title: '',
+            error: '',
             OrderEnum: 'ranked',
             forbidden: 'https://placehold.co/191x271?text=18',
             infoVisible: false,
             showDescription: null,
-            chronology: [], // Добавлено для хранения хронологии
+            chronology: [],
         };
     },
     created() {
+        this.loadState();
         this.initializePage();
     },
     methods: {
+        loadState() {
+            const savedAnimes = localStorage.getItem('animes');
+            const savedChronology = localStorage.getItem('chronology');
+            const savedPage = localStorage.getItem('currentPage');
+            const savedQuery = localStorage.getItem('searchQuery');
+            const savedLastQuery = localStorage.getItem('lastSearchQuery');
+            const savedWindow = localStorage.getItem('window');
+            const savedShikimoriId = localStorage.getItem('ShikimoriId');
+            const savedTitle = localStorage.getItem('title');
+            const savedKodikLink = localStorage.getItem('kodikLink');
+
+            if (savedAnimes) this.animes = JSON.parse(savedAnimes);
+            if (savedChronology) this.chronology = JSON.parse(savedChronology);
+            if (savedPage) this.currentPage = parseInt(savedPage, 10);
+            if (savedQuery) this.searchQuery = savedQuery;
+            if (savedLastQuery) this.lastSearchQuery = savedLastQuery;
+            if (savedWindow) this.window = JSON.parse(savedWindow);
+            if (savedShikimoriId) this.ShikimoriId = savedShikimoriId;
+            if (savedTitle) this.title = savedTitle;
+            if (savedKodikLink) this.kodikLink = savedKodikLink;
+        },
         initializePage() {
             const urlParams = new URLSearchParams(window.location.search);
             const page = parseInt(urlParams.get('page'), 10);
             const search = urlParams.get('search');
+            const title = urlParams.get('title');
             
             if (!isNaN(page) && page > 0) {
                 this.currentPage = page;
@@ -39,6 +62,11 @@ new Vue({
                 this.searchQuery = search;
                 this.lastSearchQuery = search;
                 localStorage.setItem('lastSearchQuery', search);
+            }
+
+            if (title) {
+                this.title = title;
+                this.fetchAnimeByTitle(title);
             }
             
             this.fetchAnimes();
@@ -69,26 +97,29 @@ new Vue({
                 const cacheKey = `${this.searchQuery}_${this.currentPage}`;
                 if (this.cache[cacheKey]) {
                     this.animes = this.filterAndReplaceImages(this.cache[cacheKey]);
-                    this.loading = false;
                     this.isEmpty = this.animes.length === 0;
-                    return;
+                } else {
+                    const response = await axios.post('https://shikimori.one/api/graphql', {
+                        query
+                    }, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const fetchedAnimes = response.data.data.animes || [];
+                    this.animes = this.filterAndReplaceImages(fetchedAnimes.map(anime => ({
+                        ...anime,
+                        status: this.ruStatus(anime.status)
+                    })));
+                    this.cache[cacheKey] = this.animes;
+                    this.isEmpty = this.animes.length === 0;
                 }
+                
+                localStorage.setItem('animes', JSON.stringify(this.animes));
+                localStorage.setItem('currentPage', this.currentPage.toString());
+                localStorage.setItem('searchQuery', this.searchQuery);
 
-                const response = await axios.post('https://shikimori.one/api/graphql', {
-                    query
-                }, {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                const fetchedAnimes = response.data.data.animes || [];
-                this.animes = this.filterAndReplaceImages(fetchedAnimes.map(anime => ({
-                    ...anime,
-                    status: this.ruStatus(anime.status)
-                })));
-                this.cache[cacheKey] = this.animes;
-                this.isEmpty = this.animes.length === 0;
             } catch (error) {
                 this.showError('Ошибка при получении данных: ' + error.message);
                 this.animes = [];
@@ -160,6 +191,16 @@ new Vue({
             window.history.pushState({}, '', url);
             this.fetchAnimes();
         },
+        updateTitleInUrl(title) {
+            const url = new URL(window.location);
+            url.searchParams.set('title', title);
+            window.history.pushState({}, '', url);
+        },
+        clearTitleFromUrl() {
+            const url = new URL(window.location);
+            url.searchParams.delete('title');
+            window.history.pushState({}, '', url);
+        },
         async showKodikPlayer(anime) {
             this.ShikimoriId = anime.id;
             this.title = anime.russian; 
@@ -209,7 +250,14 @@ new Vue({
                 const chronologyData = chronologyResponse.data.data.animes[0]?.chronology || [];
                 console.log('Fetched chronology:', chronologyData);  
                 this.chronology = chronologyData;
-        
+
+                localStorage.setItem('window', JSON.stringify(this.window));
+                localStorage.setItem('ShikimoriId', this.ShikimoriId);
+                localStorage.setItem('title', this.title);
+                localStorage.setItem('kodikLink', this.kodikLink);
+                localStorage.setItem('chronology', JSON.stringify(this.chronology));
+                this.updateTitleInUrl(this.title);
+
                 this.window = true;
             } catch (error) {
                 this.showError(error.message);
@@ -217,7 +265,13 @@ new Vue({
         },
         close() {
             this.window = false;
-            this.chronology = []; // Очищаем хронологию при закрытии
+            localStorage.removeItem('window');
+            localStorage.removeItem('ShikimoriId');
+            localStorage.removeItem('title');
+            localStorage.removeItem('kodikLink');
+            localStorage.removeItem('chronology');
+            this.chronology = [];
+            this.clearTitleFromUrl();
         },
         showError(message) {
             this.error = message;
@@ -235,9 +289,49 @@ new Vue({
             this.searchQuery = this.lastSearchQuery;
             this.currentPage = 1;
             this.updatePage();
+        },
+        async fetchAnimeByTitle(title) {
+            try {
+                const query = `
+                    {
+                        animes(search: "${title}", limit: 1) {
+                            id
+                            score
+                            russian
+                            poster { preview2xUrl }
+                            genres { id name }  
+                            status
+                            descriptionHtml
+                        }
+                    }
+                `;
+                
+                const response = await axios.post('https://shikimori.one/api/graphql', {
+                    query
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const anime = response.data.data.animes[0] || {};
+                if (anime.id) {
+                    this.ShikimoriId = anime.id;
+                    this.title = anime.russian;
+                    this.status = anime.status;
+                    this.descriptionHtml = anime.descriptionHtml;
+                    this.score = anime.score;
+                    this.kodikLink = ''; 
+                    this.showKodikPlayer(anime);
+                }
+            } catch (error) {
+                this.showError('Ошибка при получении данных: ' + error.message);
+            }
         }
     }
 });
+
+
 
 
 
