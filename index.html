@@ -19,29 +19,19 @@
   <body>
     <click-spark></click-spark>
     <main id="app" class="all">
-        <nav :class="{ last_query: lastSearchQuery }">
-          <a class="logo" href="/"></a>
-          <button class="mdi mdi-information-outline info" @click="showInfo"></button>
-           <div class="last"><span v-if="lastSearchQuery" @click="restoreLastSearch" class="last-search"> Последний запрос:  <span style="cursor: pointer; opacity: .7; border-bottom: 1px solid var(--color);"> {{ lastSearchQuery }} </span></span></div>
-<div class="this">
-            <input 
-                type="text" 
-                size="25" 
-                placeholder="Что хочешь посмотреть?" 
-                v-model="searchQuery"
-                @keyup.enter="searchAnimes">
-            <button 
-                class="mdi mdi-close" 
-                @click="clearSearchQuery" 
-                v-if="searchQuery" 
-                style=" border-left: none; border-radius: 0; "
-            ></button>
-            <button 
-                class="mdi mdi-magnify" 
-                @click="searchAnimes"
-            ></button>
+      <nav :class="{ last_query: lastSearchQuery }">
+        <a class="logo" href="?"></a>
+        <button class="mdi mdi-information-outline info" @click="showInfo"></button>
+        <div class="last">
+          <span v-if="lastSearchQuery" @click="restoreLastSearch" class="last-search"> Последний запрос: <span style="cursor: pointer; opacity: .7; border-bottom: 1px solid var(--color);"> {{ lastSearchQuery }} </span>
+          </span>
         </div>
-        </nav>  
+        <div class="this">
+          <input type="text" size="25" placeholder="Что хочешь посмотреть?" v-model="searchQuery" @keyup.enter="searchAnimes">
+          <button class="mdi mdi-close" @click="clearSearchQuery" v-if="searchQuery" style=" border-left: none; border-radius: 0; "></button>
+          <button class="mdi mdi-magnify" @click="searchAnimes"></button>
+        </div>
+      </nav>
       <br>
       <div v-if="loading" class="loading">Загрузка...</div>
       <div class="list" v-if="!loading && animes.length">
@@ -52,9 +42,18 @@
           </div>
           <span class="name">{{ anime.russian }}</span>
           <span :class="`status ${anime.status.class}`">{{ anime.status.text }}</span>
-          <div class="description" v-if="showDescription === anime.id && hasDescription(anime.descriptionHtml)" v-html="anime.descriptionHtml"> </div>
-        </div>        
+          <div class="description" v-if="showDescription === anime.id && hasDescription(anime.descriptionHtml)">
+            <div v-if="anime.genres && anime.genres.length">
+              <strong>Жанры:</strong> {{ formatGenres(anime.genres) }}
+            </div>
+            <div class="zzz">
+              <strong>Описание:</strong>
+              <span v-html="anime.descriptionHtml"></span>
+            </div>
+          </div>
         </div>
+      </div>
+      </div>
       <div v-else-if="!loading" class="empty-message"> Пусто </div>
       <br>
       <br>
@@ -65,35 +64,37 @@
       </div>
       <div v-if="window" class="window">
         <div class="full">
-        <div class="player">
+          <div class="player">
             <div class="header">
-                <h5 class="mdi mdi-monitor-eye title">&nbsp; &nbsp; {{ title }}</h5>
-                <span class="close" @click="close">
-                    <i class="mdi mdi-close"></i>
-                </span>
+              <h5 class="mdi mdi-monitor-eye title">&nbsp; &nbsp; {{ title }}</h5>
+              <span class="close" @click="close">
+                <i class="mdi mdi-close"></i>
+              </span>
             </div>
             <iframe :src="kodikLink" frameborder="0" allowfullscreen style="width: 100%; height:450px;"></iframe>
             <div v-if="chronology" class="chronology">
-                <h5>Хронология:</h5>
-                <div class="chrono" v-for="event in chronology" :key="event.id" @click="showKodikPlayer(event)">
-                 <img v-if="event.poster && event.poster.previewUrl" :src="event.poster.previewUrl" alt="Poster Image" />
-                 <div class="title"> {{ event.russian }} </div>
-                 <div class="date"> {{ event.airedOn.year }} </div>
-                </div>                         
+              <h5>Хронология:</h5>
+              <div class="chrono" v-for="event in chronology" :key="event.id" @click="showKodikPlayer(event)">
+                <img v-if="event.poster && event.poster.previewUrl" :src="event.poster.previewUrl" alt="Poster Image" />
+                <div class="title"> {{ event.russian }} </div>
+                <div class="date"> {{ event.airedOn.year }} </div>
+              </div>
             </div>
+          </div>
         </div>
-    </div>
-  </div>
-       <div v-if="infoVisible" class="info-popup">
+      </div>
+      <div v-if="infoVisible" class="info-popup">
         <div class="info-popup-content">
-            <span class="close" @click="closeInfo"><i class="mdi mdi-close" style=" font-size: 16px; "></i></span>
-            <h4>Информация</h4>
-            <hr>
-            <br>
-            <p>На сайте часто ведутся технические работы.</p>
-            <br>
+          <span class="close" @click="closeInfo">
+            <i class="mdi mdi-close" style=" font-size: 16px; "></i>
+          </span>
+          <h4>Информация</h4>
+          <hr>
+          <br>
+          <p>На сайте часто ведутся технические работы.</p>
+          <br>
         </div>
-    </div>
+      </div>
       <div v-if="error" class="error">
         <i class="mdi mdi-alert-octagon" style="font-size:20px; color: #721c24;"></i>{{ error }}
       </div>
