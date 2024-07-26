@@ -480,9 +480,15 @@ nav > .this > button {
   }
 }
 
+.chronology:has(.chrono) {
+    display: flex;
+}
 
 .chronology {
-  display: flex;
+    display: none;
+}
+
+.chronology {
   flex-direction: column;
   gap: 5px;
 }
