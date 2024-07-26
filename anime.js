@@ -87,7 +87,7 @@ new Vue({
                             score
                             russian
                             poster { preview2xUrl }
-                            genres { id name }  
+                            genres { id russian }  
                             status
                             descriptionHtml
                         }
@@ -142,7 +142,7 @@ new Vue({
         },
         filterAndReplaceImages(animes) {
             return animes.map(anime => {
-                const isHentai = anime.genres.some(genre => genre.name.toLowerCase() === 'hentai');
+                const isHentai = anime.genres.some(genre => genre.russian.toLowerCase() === 'hentai');
                 const placeholderImage = isHentai ? this.forbidden : anime.poster.preview2xUrl;
 
                 return {
@@ -153,11 +153,15 @@ new Vue({
                 };
             });
         },
+        formatGenres(genres) {
+            return genres.map(genre => genre.russian).join(', ');
+        },
         hasDescription(descriptionHtml) {
+            if (!descriptionHtml) return false;
             const div = document.createElement('div');
             div.innerHTML = descriptionHtml;
-            const text = div.querySelector('.b-text_with_paragraphs')?.innerText.trim();
-            return !!text;
+            const text = div.textContent || div.innerText;
+            return text.trim().length > 0;
         },
         async searchAnimes() {
             this.lastSearchQuery = this.searchQuery;
@@ -205,7 +209,7 @@ new Vue({
             this.ShikimoriId = anime.id;
             this.title = anime.russian; 
             this.status = anime.status;
-            this.descriptionHtml = anime.description;
+            this.descriptionHtml = anime.descriptionHtml;
             this.score = anime.score;
             const kodikUrl = `https://kodikapi.com/search?token=50e058ac7c2b71a73ee87e4fea333544&types=anime-serial,anime&shikimori_id=${this.ShikimoriId}`;
             
@@ -299,7 +303,7 @@ new Vue({
                             score
                             russian
                             poster { preview2xUrl }
-                            genres { id name }  
+                            genres { id russian }  
                             status
                             descriptionHtml
                         }
