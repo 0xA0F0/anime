@@ -72,6 +72,10 @@ h6 {
   padding: 0;
 }
 
+strong {
+  font-weight: bold;
+}
+
 h1 {
   font-size: 2.5em;
   line-height: 1.2;
@@ -423,7 +427,6 @@ nav > .this > button {
 .info-popup-content {
   background: var(--c);
   padding: 15px;
-  border-radius: 8px;
   width: 80%;
   max-width: 600px;
   position: relative;
@@ -438,20 +441,30 @@ nav > .this > button {
 }
 
 
+.description > .zzz {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 9;
+  -webkit-box-orient: vertical;
+}
+
 
 .description {
   position: absolute;
   left: 195px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 10;
-  -webkit-box-orient: vertical;
   z-index: 9;
   background: var(--c);
   width: 200px;
   padding: 5px;
   border: 1px solid var(--color);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.b-text_with_paragraphs {
+  display: inline;
 }
 
 @media (max-width:978px) {
