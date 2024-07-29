@@ -311,6 +311,7 @@ body {
 .comment > img {
     width: 40px;
     float: left;
+    margin-right: 10px;
 }
 .cmt {
     margin-top: 6px;
