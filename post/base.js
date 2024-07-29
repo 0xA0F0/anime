@@ -47,7 +47,7 @@ function displayComment(e) {
 	let l = document.createElement("img");
 	l.src = "ava.jpg", l.alt = "pirate", t.appendChild(l);
 	let s = document.createElement("span");
-	s.textContent = "0xA9F9", s.classList.add("nickname"), t.appendChild(s);
+	s.textContent = "null", s.classList.add("nickname"), t.appendChild(s);
 	let o = document.createElement("span");
 	o.textContent = formatTimeDifference(e.date), o.classList.add("date"), t.appendChild(o);
 	let r = document.createElement("div");
