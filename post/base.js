@@ -45,7 +45,7 @@ function displayComment(e) {
 	}
 	t.appendChild(n);
 	let l = document.createElement("img");
-	l.src = "/img/ava.webp", l.alt = "pirate", t.appendChild(l);
+	l.src = "ava.jpg", l.alt = "pirate", t.appendChild(l);
 	let s = document.createElement("span");
 	s.textContent = "0xA9F9", s.classList.add("nickname"), t.appendChild(s);
 	let o = document.createElement("span");
