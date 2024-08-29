@@ -45,7 +45,7 @@ function handleFiles(files) {
     formData.append("image", file);
     formData.append("key", "6db7231dddc8659c27f5b82c502d4382");
     if (!noExpirationCheckbox.checked) {
-        formData.append("expiration", 2592000);
+        formData.append("expiration", 60);
     }
 
     const xhr = new XMLHttpRequest();
