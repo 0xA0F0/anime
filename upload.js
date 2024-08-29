@@ -1,15 +1,25 @@
-document.getElementById("upload").addEventListener("click", function() {
+const uploadElement = document.getElementById("upload");
+
+uploadElement.addEventListener("click", function() {
     document.getElementById("files").click();
 });
 
-document.getElementById("upload").addEventListener("dragover", function(e) {
+uploadElement.addEventListener("dragover", function(e) {
     e.preventDefault();
     e.stopPropagation();
+    uploadElement.classList.add("dragover");
 });
 
-document.getElementById("upload").addEventListener("drop", function(e) {
+uploadElement.addEventListener("dragleave", function(e) {
     e.preventDefault();
     e.stopPropagation();
+    uploadElement.classList.remove("dragover");
+});
+
+uploadElement.addEventListener("drop", function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    uploadElement.classList.remove("dragover");
     handleFiles(e.dataTransfer.files);
 });
 
@@ -18,6 +28,10 @@ document.getElementById("files").addEventListener("change", function(e) {
 });
 
 function handleFiles(files) {
+    if (files.length === 0) {
+        return;
+    }
+
     const file = files[0];
     const messageElement = document.getElementById("message");
     const progressBar = document.getElementById("progressBar");
