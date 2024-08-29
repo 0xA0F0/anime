@@ -43,7 +43,7 @@ function handleFiles(files) {
 
     const formData = new FormData();
     formData.append("image", file);
-    formData.append("key", "6db7231dddc8659c27f5b82c502d4382");
+    formData.append("key", "45fd6a42c90f6c423142b91e591b910a");
     if (!noExpirationCheckbox.checked) {
         formData.append("expiration", 2592000);
     }
