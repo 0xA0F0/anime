@@ -1,3 +1,4 @@
+
 const uploadElement = document.getElementById("upload");
 
 uploadElement.addEventListener("click", function() {
@@ -78,7 +79,7 @@ function handleFiles(files) {
         if (xhr.status === 200) {
             const response = JSON.parse(xhr.responseText);
             if (response.success) {
-                linkElement.innerHTML = `Скопируй: <a href="${response.data.url}" target="_blank">${response.data.url}</a>`;
+                linkElement.innerHTML = `<a href="${response.data.url}" class="link" target="_blank">${response.data.url}</a> <span class="mdi mdi-content-copy copy" style="font-size: 15px; cursor: pointer;"></span>`;
                 linkElement.classList.add("ready");
             } else {
                 messageElement.textContent = "Ошибка при загрузке файла.";
@@ -98,3 +99,27 @@ function handleFiles(files) {
 
     xhr.send(formData);
 }
+
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('copy')) {
+        const linkElement = e.target.previousElementSibling;
+        if (linkElement && linkElement.classList.contains('link')) {
+            const range = document.createRange();
+            range.selectNode(linkElement);
+            window.getSelection().removeAllRanges(); 
+            window.getSelection().addRange(range);
+
+            try {
+                document.execCommand('copy');
+                e.target.classList.add('copied');
+                setTimeout(() => e.target.classList.remove('copied'), 3000);
+            } catch (err) {
+                console.error('Ошибка при копировании текста: ', err);
+            }
+            
+            window.getSelection().removeAllRanges(); 
+        } else {
+            console.error('Не удалось найти элемент с классом link');
+        }
+    }
+});
