@@ -465,3 +465,9 @@ document.addEventListener('DOMContentLoaded', function() {
         element.addEventListener('click', launchConfetti);
     });
 });
+
+// ссылка в чат
+
+document.querySelector('.chat').addEventListener('click', function() {
+    window.location.href = '/chat';
+});
