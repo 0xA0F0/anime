@@ -192,7 +192,7 @@ function createRegistrationForm() {
 	});
 
 	backButton.addEventListener("click", function() {
-		window.location.href = '/';
+		window.location.href = '/chat';
 	});
 }
 
