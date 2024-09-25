@@ -33,7 +33,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const storage = getStorage(app);
 
-if (window.location.search === '${window.location.origin}/chat/?reg') {
+if (window.location.search === '?reg') {
 	createRegistrationForm();
 } else if (localStorage.getItem('loggedIn') === 'true') {
 	createInSysteme();
@@ -56,9 +56,7 @@ function createLoginForm() {
 		loginUser();
 	});
 
-	document.getElementById("register").addEventListener("click", function() {
-		window.location.href = "${window.location.origin}/chat/?reg";
-	});
+document.getElementById("register").addEventListener("click", function() { window.location.href = "/chat/?reg"; 
 
 	document.getElementById("password").addEventListener("keydown", function(event) {
 		if (event.key === 'Enter') {
