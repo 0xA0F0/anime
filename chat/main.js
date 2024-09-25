@@ -33,7 +33,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const storage = getStorage(app);
 
-if (window.location.search === '/?reg') {
+if (window.location.search === '?reg') {
 	createRegistrationForm();
 } else if (localStorage.getItem('loggedIn') === 'true') {
 	createInSysteme();
@@ -57,7 +57,7 @@ function createLoginForm() {
 	});
 
 	document.getElementById("register").addEventListener("click", function() {
-		window.location.href = "/?reg";
+		window.location.href = "?reg";
 	});
 
 	document.getElementById("password").addEventListener("keydown", function(event) {
