@@ -208,7 +208,7 @@ nav > .this > input::placeholder {
 
 nav {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto auto 1fr auto;
   width: 100%;
   gap: 10px;
   align-items: center;
