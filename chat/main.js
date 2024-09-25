@@ -244,7 +244,7 @@ function registerNewUser() {
 					showMessage("Регистрация прошла успешно!", "success");
 					localStorage.setItem('loggedIn', 'true');
 					localStorage.setItem('currentUser', user);
-					window.location.href = "/";
+					window.location.href = "/chat";
 				})
 				.catch((error) => {
 					console.error("Ошибка при регистрации пользователя:", error.message);
@@ -262,7 +262,7 @@ function registerNewUser() {
 					showMessage("Регистрация прошла успешно!", "success");
 					localStorage.setItem('loggedIn', 'true');
 					localStorage.setItem('currentUser', user);
-					window.location.href = "/";
+					window.location.href = "/chat";
 				})
 				.catch((error) => {
 					console.error("Ошибка при регистрации пользователя:", error.message);
