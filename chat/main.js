@@ -639,7 +639,7 @@ function loadPosts() {
                             <span class="reply mdi mdi-reply" data-id="${postId}" data-username="${username}"></span>
                         </div>
                         <div class="info">
- <a href="${avatar}">  <img src="${avatar}" style="--ava:34px;width:var(--ava); height:var(--ava);float:left;border-radius:50%;box-shadow: 0px 0px 0px 3px var(--bg);" alt="avatar"> </a>
+ <a href="${avatar}">  <img src="${avatar}" style="--ava:34px;width:var(--ava); height:var(--ava); cursor:zoom-in; float:left;border-radius:50%;box-shadow: 0px 0px 0px 3px var(--bg);" alt="avatar"> </a>
  <strong>${username}</strong>
                             <small>${date}</small>
                         </div>
