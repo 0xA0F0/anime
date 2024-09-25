@@ -56,7 +56,9 @@ function createLoginForm() {
 		loginUser();
 	});
 
-document.getElementById("register").addEventListener("click", function() { window.location.href = "/chat/?reg"; 
+	document.getElementById("register").addEventListener("click", function() {
+		window.location.href = "/chat/?reg";
+	});
 
 	document.getElementById("password").addEventListener("keydown", function(event) {
 		if (event.key === 'Enter') {
