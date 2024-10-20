@@ -13,7 +13,7 @@ export default {
             isLoading: false,
             statusIcons: {
                 'watching': 'play_circle',
-                'planne∂d': 'today',
+                'planned': 'today',
                 'completed': 'check',
                 'on_hold': 'inbox',
                 'dropped': 'delete',
