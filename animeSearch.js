@@ -349,8 +349,8 @@ export default {
                 iframe.style.width = '80%';
                 iframe.style.maxWidth = '1000px';
                 iframe.style.maxHeight = '600px';
-                iframe.style.border = 'none';                
-
+                iframe.style.border = 'none';   
+                iframe.allowFullscreen = true;
                 const closeButton = document.createElement('span');
                 closeButton.classList.add("material-symbols-outlined", "close");
                 closeButton.innerText = 'close';
