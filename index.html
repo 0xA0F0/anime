@@ -19,7 +19,7 @@
 	</head>
 	<body>
     <click-spark></click-spark>
-		<div id="app">
+		<div id="app" style="display:none">
 			<button v-if="isVisible" @click="scrollToTop" class="go-to-top material-symbols-outlined"> arrow_upward </button>
 			<div v-if="showFAQModal" class="modal-overlay" @click.self="closeFAQModal">
 				<div class="modal-content">
