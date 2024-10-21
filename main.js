@@ -281,6 +281,8 @@ createApp({
         },
     },
     mounted() {
+        document.getElementById('app').style.display = 'block';
+        document.getElementById('preloader').style.display = 'none';
         window.addEventListener('scroll', this.toggleVisibility);
         window.addEventListener('show-message', (event) => {
             const { message, type } = event.detail;
