@@ -1,399 +1,241 @@
-// main.js
+new Vue({
+	el: '#main',
+	data: {
+		inputUserId: '',
+		userId: '',
+		user: {},
+		userLoaded: false,
+		isGuest: false,
+		userAnimeList: [],
+		filteredAnimeList: [],
+		showAnimeList: false,
+		currentStatus: '',
+		statuses: ['', 'watching', 'planned', 'completed', 'on_hold', 'dropped'],
+		statusIcons: {
+			'': 'list',
+			'watching': 'play_circle',
+			'planned': 'today',
+			'completed': 'check',
+			'on_hold': 'inbox',
+			'dropped': 'delete'
+		},
+		releaseStatusIcons: {
+			'ongoing': 'play_circle',
+			'released': 'check'
+		},
+		searchQuery: '',
+		searchResults: [],
+		randomText: 'l8zp99yydgjatfs6glm3x1i3j3oujnr0',
+		debouncedSearchAnime: null,
+	},
+	methods: {
+		loginAsGuest() {
+			this.isGuest = true;
+			this.userLoaded = true;
+		},
+		async fetchUserInfo() {
+			if (this.inputUserId.trim() !== '') {
+				this.userId = this.inputUserId.trim();
 
-import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
-import auth from './auth.js';
-import animeSearch from './animeSearch.js';
-import './firebaseConfig.js';
+				const url = `https://shikimori.one/api/users/${this.userId}/anime_rates?limit=5000`;
+				try {
+					const response = await fetch(url, {
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+					});
+					const data = await response.json();
+					if (Array.isArray(data) && data.length > 0) {
+						this.userAnimeList = data;
 
-createApp({
-    mixins: [auth, animeSearch],
-    data() {
-        return {
-            route: window.location.hash || '',
-            theme: localStorage.getItem('theme') || 'light',
-            message: '',
-            isVisible: false,
-            messageClass: '',
-            isAuthRoute: false,
-            user: null,
-            modalAnimes: [],
-            isSearchVisible: true,
-            searchQuery: '',
-            showFAQModal: false,
-            showPassword: false,
-            isDragOver: false,
-        };
-    },
+						const userData = data[0].user;
+						if (userData && userData.nickname) {
+							this.user = {
+								nickname: userData.nickname,
+								avatarUrl: userData.image.x160
+							};
+							this.userLoaded = true;
+							this.isGuest = false;
 
-    created() {
-        document.documentElement.className = this.theme;
-        window.addEventListener('hashchange', () => {
-            this.route = window.location.hash;
-            this.checkAuth();
-            this.checkRoute();
-        });
-        firebase.auth().onAuthStateChanged(user => {
-            this.user = user;
-            this.checkAuth();
-            this.checkRoute();
-        });
-        this.checkHashAndShowPlayer();
-        this.debouncedSearch = this.debounce(this.searchAnime, 300);
-    },
+							this.inputUserId = '';
+						} else {
+							alert('Не удалось получить информацию о пользователе.');
+						}
+					} else {
+						alert('Ошибка, или пользователь скрыл свой список.');
+					}
+				} catch (error) {
+					console.error('Ошибка при выполнении запроса:', error);
+				}
+			}
+		},
+		fetchUserAnimeList(status) {
+			this.currentStatus = status;
+			if (status === '') {
+				this.filteredAnimeList = this.userAnimeList.filter(rate => rate.anime);
+			} else {
+				this.filteredAnimeList = this.userAnimeList.filter(rate => rate.status === status && rate.anime);
+			}
+			console.log(`Аниме со статусом ${status}:`, this.filteredAnimeList);
+			if (this.filteredAnimeList.length === 0) {
+				alert(`Нет аниме с выбранным статусом.`);
+			}
+			this.showAnimeList = true;
+		},
+		closeAnimeList() {
+			this.showAnimeList = false;
+		},
 
-    methods: {
-        toggleVisibility() {
-            this.isVisible = window.scrollY > 300;
-        },
-
-        scrollToTop() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        },
-
-        checkRoute() {
-            this.isAuthRoute = (this.route === '#login' || this.route === '#reg' || this.route === '#forgot');
-            if (this.user && this.isAuthRoute) {
-                this.navigateTo('#profil');
-            }
-        },
-
-        showMessage(text, type) {
-            this.message = text;
-            this.messageClass = type;
-
-            setTimeout(() => {
-                this.message = '';
-                this.messageClass = '';
-            }, 5000);
-        },
-
-        checkAuth() {
-            if (!this.user && this.route === '#profil') {
-                this.navigateTo('#login');
-            }
-        },
-
-        checkHashAndShowPlayer() {
-            const hash = window.location.hash;
-            const idMatch = hash.match(/id=(\d+)/);
-            if (idMatch) {
-                const animeId = idMatch[1];
-                this.showKodikPlayer(animeId);
-            }
-        },
-
-        navigateTo(route) {
-            window.location.hash = route;
-        },
-
-        debounce(func, wait) {
-            let timeout;
-            return function (...args) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(this, args), wait);
-            };
-        },
-
-        toggleTheme() {
-            this.theme = this.theme === 'light' ? 'dark' : 'light';
-            document.documentElement.className = this.theme;
-            localStorage.setItem('theme', this.theme);
-        },
-
-        forgotPage() {
-            this.email = "";
-            window.location.hash = "#forgot";
-        },
-
-        regPage() {
-            this.email = "";
-            window.location.hash = "#reg";
-        },
-
-        logPage() {
-            this.email = "";
-            window.location.hash = "#login";
-        },
-
-        homePage() {
-            window.location.hash = "#";
-        },
-
-        handleShowMessage(payload) {
-            const { message, type } = payload;
-            this.showMessage(message, type);
-        },
-
-        triggerFileUpload() {
-            this.$refs.fileInput.click();
-        },
-
-        async handleJsonChange(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = async (e) => {
-                    try {
-                        const jsonData = JSON.parse(e.target.result);
-                        const cleanedData = this.cleanJsonData(jsonData);
-
-                        const database = firebase.database();
-                        const userAnimesRef = database.ref('users/' + this.user.uid + '/animes');
-                        await userAnimesRef.set(cleanedData);
-
-                        await this.loadUserAnimes();
-
-                        this.showMessage('Данные успешно загружены!', 'success');
-                    } catch (error) {
-                        this.showMessage('Ошибка при загрузке JSON файла: ' + error.message, "error");
+		async searchAnime() {
+			if (this.searchQuery.trim() !== '') {
+				const query = `
+                {
+                    animes(search: "${this.searchQuery}", limit: 25) {
+                        id
+                        russian
+                        status
+                        poster {
+                            id
+                            originalUrl
+                            mainUrl
+                        }
                     }
-                };
-                reader.readAsText(file);
-            }
-        },
-
-        cleanJsonData(jsonData) {
-            if (!Array.isArray(jsonData)) {
-                throw new Error("Неверный формат JSON файла. Ожидается массив объектов.");
-            }
-
-            return jsonData.map(anime => {
-                if (
-                    typeof anime.target_id === 'undefined' ||
-                    typeof anime.target_title === 'undefined' ||
-                    typeof anime.target_title_ru === 'undefined' ||
-                    typeof anime.status === 'undefined' ||
-                    anime.target_id === null ||
-                    anime.target_title === null ||
-                    anime.target_title_ru === null ||
-                    anime.status === null
-                ) {
-                    throw new Error("Каждый объект должен содержать target_id, target_title, target_title_ru и status.");
                 }
+                `;
+				try {
+					const response = await fetch('https://shikimori.one/api/graphql', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({
+							query
+						})
+					});
+					const data = await response.json();
+					if (data && data.data && data.data.animes) {
+						const animesWithKodik = await Promise.all(
+							data.data.animes.map(async (anime) => {
+								const kodikUrl = `https://kodikapi.com/search?token=${this.randomText}&shikimori_id=${anime.id}`;
+								try {
+									const kodikResponse = await fetch(kodikUrl);
+									const kodikData = await kodikResponse.json();
+									if (kodikData.results && kodikData.results.length > 0) {
+										return anime;
+									} else {
+										return null;
+									}
+								} catch (error) {
+									console.error('Ошибка при обращении к Kodik API:', error);
+									return null;
+								}
+							})
+						);
+						this.searchResults = animesWithKodik.filter(anime => anime !== null);
+					} else {
+						console.error('Не удалось получить результаты поиска.');
+					}
+				} catch (error) {
+					console.error('Ошибка при выполнении запроса:', error);
+				}
+			} else {
+				this.searchResults = [];
+			}
+		},
 
-                return {
-                    id: String(anime.target_id),
-                    status: anime.status,
-                    nameRU: anime.target_title_ru,
-                    nameEN: anime.target_title
-                };
-            });
-        },
+		selectAnime(animeId) {
+			window.location.hash = `#id=${animeId}`;
+			this.showKodikPlayer(animeId);
+		},
+		async showKodikPlayer(animeId) {
+			if (!this.userLoaded) {
+				this.loginAsGuest();
+			}
 
-        async openAnimeList(status) {
-            if (!this.user) return;
+			const kodikUrl = `https://kodikapi.com/search?token=${this.randomText}&shikimori_id=${animeId}`;
+			try {
+				const response = await fetch(kodikUrl);
+				const data = await response.json();
+				if (data.results && data.results.length > 0) {
+					const playerLink = data.results[0].link;
+					this.openPlayerModal(playerLink);
+				} else {
+					alert('Этого аниме нет в базе данных.');
+				}
+			} catch (error) {
+				console.error('Ошибка при получении плеера Kodik:', error);
+			}
+		},
+		openPlayerModal(playerLink) {
+			const existingModal = document.getElementById('kodik-player-modal');
+			if (existingModal) {
+				existingModal.remove();
+			}
 
-            const database = firebase.database();
-            const userAnimesRef = database.ref('users/' + this.user.uid + '/animes');
+			const modal = document.createElement('div');
+			modal.id = 'kodik-player-modal';
 
-            try {
-                const snapshot = await userAnimesRef.once('value');
-                const userAnimesData = snapshot.val() || [];
-
-                if (status) {
-                    this.modalAnimes = userAnimesData.filter(anime => anime.status === status);
-                } else {
-                    this.modalAnimes = Object.values(userAnimesData);
-                }
-                const existingModal = document.getElementById('anime-list-modal');
-                if (existingModal) {
-                    existingModal.remove();
-                }
-
-                this.showModal();
-            } catch (error) {
-                console.error("Ошибка при загрузке аниме пользователя:", error);
-                this.showMessage("Ошибка при загрузке аниме пользователя.", "error");
-            }
-        },
-
-        showModal() {
-            this.isSearchVisible = false;
-            const modal = document.createElement('div');
-            modal.id = 'anime-list-modal';
-            const content = document.createElement('div');
-            const closeButton = document.createElement('span');
-            closeButton.classList.add("material-symbols-outlined", "close");
-            closeButton.innerText = 'close';
-            closeButton.style.cursor = 'pointer';
-            closeButton.style.float = 'right';
-            closeButton.style.setProperty('font-size', '17px', 'important');
-
-            closeButton.addEventListener('click', () => {
-                this.closeModal(modal);
-            });
-
-            content.appendChild(closeButton);
-
-            modal.addEventListener('click', (event) => {
-                if (event.target === modal) {
-                    this.closeModal(modal);
-                }
-            });
-
-            if (this.modalAnimes.length > 0) {
-                const animeList = document.createElement('div');
-                animeList.style.listStyle = 'num';
-                animeList.style.display = 'flex';
-                animeList.style.flexDirection = 'column';
-                animeList.style.gap = '5px';
-
-                this.modalAnimes.forEach(anime => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = anime.nameRU || anime.nameEN || 'Аниме без названия';
-                    animeList.appendChild(listItem);
-                });
-                content.appendChild(animeList);
-            } else {
-                const noAnimesMessage = document.createElement('p');
-                noAnimesMessage.textContent = 'Нет аниме в этом списке.';
-                content.appendChild(noAnimesMessage);
-            }
-
-            modal.appendChild(content);
-            document.body.appendChild(modal);
-            const pageElement = document.querySelector('.page');
-            if (pageElement) {
-                pageElement.appendChild(modal);
-            } else {
-                console.error('Элемент с классом "page" не найден.');
-            }
-        },
-
-        closeModal(modal) {
-            modal.remove();
-            this.isSearchVisible = true;
-        },
-
-        openFAQModal() {
-            this.showFAQModal = true;
-        },
-        closeFAQModal() {
-            this.showFAQModal = false;
-        },
-        handleKeyDown(event) {
-            if (event.key === 'Escape' && this.showFAQModal) {
-                this.closeFAQModal();
-            }
-        },
-    },
-    mounted() {
-        document.getElementById('app').style.display = 'block';
-        window.addEventListener('scroll', this.toggleVisibility);
-        window.addEventListener('show-message', (event) => {
-            const { message, type } = event.detail;
-            this.showMessage(message, type);
-        });
-        window.addEventListener('keydown', this.handleKeyDown);
-        this.toggleVisibility();
-    },
-    beforeUnmount() {
-        window.removeEventListener('scroll', this.toggleVisibility);
-        window.removeEventListener('show-message', this.handleShowMessage);
-        window.removeEventListener('keydown', this.handleKeyDown);
-    }
-}).mount('#app');
+			const iframe = document.createElement('iframe');
+			iframe.src = playerLink.startsWith('http') ? playerLink : `https:${playerLink}`;
+			iframe.allowFullscreen = true;
 
 
+			const closeButton = document.createElement('span');
+			closeButton.textContent = 'close';
+			closeButton.classList.add('close-button', 'material-symbols-outlined');
 
-// spark
+			closeButton.addEventListener('click', () => {
+				document.body.removeChild(modal);
+				window.location.hash = '';
+			});
 
-class ClickSpark extends HTMLElement {
-    constructor() {
-      super();
-      this.attachShadow({ mode: "open" });
-      this.root = document.documentElement;
-      this.svg;
-    }
-  
-    get activeEls() {
-      return this.getAttribute("active-on");
-    }
-  
-    connectedCallback() {
-      this.setupSpark();
-  
-      this.root.addEventListener("click", (e) => {
-        if (this.activeEls && !e.target.matches(this.activeEls)) return;
-  
-        this.setSparkPosition(e);
-        this.animateSpark();
-      });
-    }
-  
-    animateSpark() {
-      let sparks = [...this.svg.children];
-      let size = parseInt(sparks[0].getAttribute("y1"));
-      let offset = size / 2 + "px";
-  
-      let keyframes = (i) => {
-        let deg = `calc(${i} * (360deg / ${sparks.length}))`;
-  
-        return [
-          {
-            strokeDashoffset: size * 3,
-            transform: `rotate(${deg}) translateY(${offset})`
-          },
-          {
-            strokeDashoffset: size,
-            transform: `rotate(${deg}) translateY(0)`
-          }
-        ];
-      };
-  
-      let options = {
-        duration: 660,
-        easing: "cubic-bezier(0.25, 1, 0.5, 1)",
-        fill: "forwards"
-      };
-  
-      sparks.forEach((spark, i) => spark.animate(keyframes(i), options));
-    }
-  
-    setSparkPosition(e) {
-      let rect = this.root.getBoundingClientRect();
-  
-      this.svg.style.left =
-        e.clientX - rect.left - this.svg.clientWidth / 2 + "px";
-      this.svg.style.top =
-        e.clientY - rect.top - this.svg.clientHeight / 2 + "px";
-    }
-  
-    setupSpark() {
-      let template = `
-        <style>
-          :host {
-            display: contents;
-          }
-          
-          svg {
-            pointer-events: none;
-            position: absolute;
-            rotate: -20deg;
-            z-index:9999
-          }
-  
-          line {
-            stroke-dasharray: 30;
-            stroke-dashoffset: 30;
-            transform-origin: center;
-            stroke: tomato  ; 
-          }
-        </style>
-        <svg width="30" height="30" viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="4">
-          ${Array.from(
-            { length: 8 },
-            (_) => `<line x1="50" y1="30" x2="50" y2="4"/>`
-          ).join("")}
-        </svg>
-      `;
-  
-      this.shadowRoot.innerHTML = template;
-      this.svg = this.shadowRoot.querySelector("svg");
-    }
-  }
-  
-  customElements.define("click-spark", ClickSpark);
+			modal.appendChild(iframe);
+			modal.appendChild(closeButton);
+			document.body.appendChild(modal);
+
+			modal.addEventListener('click', (event) => {
+				if (event.target === modal) {
+					modal.remove();
+					window.location.hash = '';
+				}
+			});
+		},
+		handleHashChange() {
+			const hash = window.location.hash;
+			if (hash.startsWith('#id=')) {
+				const animeId = hash.substring(4);
+
+				if (!this.userLoaded) {
+					this.loginAsGuest();
+				}
+
+				this.showKodikPlayer(animeId);
+			}
+		},
+		debounce(func, wait) {
+			let timeout;
+			return function(...args) {
+				const later = () => {
+					clearTimeout(timeout);
+					func.apply(this, args);
+				};
+				clearTimeout(timeout);
+				timeout = setTimeout(later, wait);
+			};
+		},
+	},
+	watch: {
+		searchQuery() {
+			this.debouncedSearchAnime();
+		}
+	},
+	created() {
+		window.addEventListener('hashchange', this.handleHashChange);
+		this.handleHashChange();
+		this.debouncedSearchAnime = this.debounce(this.searchAnime, 500);
+	},
+	beforeDestroy() {
+		window.removeEventListener('hashchange', this.handleHashChange);
+	}
+});
