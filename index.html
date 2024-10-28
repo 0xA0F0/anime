@@ -39,12 +39,11 @@
         <div v-if="showAnimeList">
           <div v-if="filteredAnimeList.length > 0" style="display: flex; flex-direction: column; gap: 5px;clear: both;">
             <span class="close-button material-symbols-outlined" @click="closeAnimeList">close</span>
-            <div v-for="rate in filteredAnimeList" :key="rate.id"  @click.prevent="selectAnime(rate.anime.id)" style=" display: flex; flex-direction: row; gap: 10px;align-items: center;" class="aa">
+            <div v-for="rate in filteredAnimeList" :key="rate.id"  @click.prevent="selectAnime(rate.anime.id)" style=" display: flex; flex-direction: row; gap: 10px;align-items: center;" class="anime">
               <img :src="'https://shikimori.one/' + (rate.anime.image ? rate.anime.image.x48 : '')" :alt="rate.anime.russian || rate.anime.name" class="poster">
               <span>
                 {{ rate.anime ? (rate.anime.russian || rate.anime.name) : 'Название недоступно' }}
               </span>
-		    <span class="icon material-symbols-outlined">{{ releaseStatusIcons[anime.status] }}</span>
             </div>
           </div>
           <p v-else>Нет аниме с выбранным статусом.</p>
