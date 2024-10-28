@@ -44,6 +44,7 @@
               <span>
                 {{ rate.anime ? (rate.anime.russian || rate.anime.name) : 'Название недоступно' }}
               </span>
+		    <span class="icon material-symbols-outlined">{{ releaseStatusIcons[rate.anime.status] }}</span>
             </div>
           </div>
           <p v-else>Нет аниме с выбранным статусом.</p>
