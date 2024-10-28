@@ -85,14 +85,11 @@ input[type="text"]:focus {
     cursor: pointer;
 }
 
-.anime:hover,
-.aa:hover {
+.anime:hover {
     background: var(--color);
     color: var(--bg);
 }
-.aa {
-    cursor: pointer;
-}
+
 .poster {
     --size: 40px;
     width: var(--size);
@@ -102,6 +99,7 @@ input[type="text"]:focus {
 .anime .icon {
     margin-right: 5px;
     position: relative;
+    font-size:16px;
 }
 
 .status-buttons {
