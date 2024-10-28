@@ -55,11 +55,11 @@
           <span class="material-symbols-outlined" style=" grid-area: 1/1; margin-left: auto; margin-right: 5px; background: var(--bg); z-index: 1; height: 20px; align-self: center;margin-top: -3px; ">search</span>
         </div>
         <div v-if="searchResults.length > 0 " style="display: flex; flex-direction: column; gap:10px">
-          <div v-for="anime in searchResults" :key="anime.id" class="anime">
+          <div v-for="anime in searchResults" :key="anime.id" class="anime"  @click.prevent="selectAnime(anime.id)">
             <img :src="anime.poster ? anime.poster.mainUrl : ''" :alt="anime.russian || anime.name" class="poster">
-            <div @click.prevent="selectAnime(anime.id)">
+            <span>
               {{ anime.russian || anime.name }}
-            </div>
+            </span>
             <span class="icon material-symbols-outlined">{{ releaseStatusIcons[anime.status] }}</span>
           </div>
         </div>
