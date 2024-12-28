@@ -18,7 +18,7 @@
   <body>
     <div id="main" class="main" v-cloak>
       <div v-if="!userLoaded" style="display: grid;gap: 5px;grid-template-columns: 1fr auto auto;">
-        <input type="text" v-model="inputUserId" placeholder="ID пользователя">
+        <input type="text" v-model="inputUserId" placeholder="ID пользователя или ник">
         <button type="submit" @click="fetchUserInfo">Войти</button>
         <button @click="loginAsGuest">Войти как гость</button>
       </div>
